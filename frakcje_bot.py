@@ -266,47 +266,58 @@ async def frakcje(ctx):
 async def on_raw_reaction_add(payload):
     if payload.member.bot:
         return
+
     guild = bot.get_guild(payload.guild_id)
     emoji = str(payload.emoji)
     frakcja = REACTION_FRAKCJE.get(emoji)
+
     if not frakcja:
-        return
+        return  # reakcja spoza listy
+
+    async with aiosqlite.connect("frakcje.db") as db:
+        cursor = await db.execute("SELECT faction FROM users WHERE user_id = ?", (payload.member.id,))
+        row = await cursor.fetchone()
+
+        if row and row[0] != "brak" and row[0] is not None:
+            try:
+                await payload.member.send(f"❌ Masz już przypisaną frakcję: **{row[0].title()}**. Nie możesz jej zmienić.")
+            except:
+                pass
+            return  # ZATRZYMAJ przed nadaniem jakichkolwiek ról
+
+    # Jeśli dotąd nie wróciło, to znaczy że można przypisać frakcję i role
 
     frakcja_ro = await get_or_create_role(guild, frakcja.lower())
     if not frakcja_ro:
         return
 
+    # Usuń stare role frakcyjne
     for r in payload.member.roles:
         if r.name.lower() in REACTION_FRAKCJE.values():
             await payload.member.remove_roles(r)
+
     await payload.member.add_roles(frakcja_ro)
 
     async with aiosqlite.connect("frakcje.db") as db:
-        cursor = await db.execute("SELECT faction FROM users WHERE user_id = ?", (payload.member.id,))
-        row = await cursor.fetchone()
-        if row and row[0] != "brak":
-            try:
-                await payload.member.send(f"❌ Już masz frakcję: **{row[0].title()}**.")
-            except:
-                pass
-            return
-        elif row:
+        if row:
             await db.execute("UPDATE users SET faction = ? WHERE user_id = ?", (frakcja, payload.member.id))
         else:
             await db.execute("INSERT INTO users (user_id, faction, xp, level) VALUES (?, ?, ?, ?)",
                              (payload.member.id, frakcja, 0, 1))
         await db.commit()
 
-    # Rola poziomu 1
-    role1 = LEVEL_ROLES.get(frakcja, {}).get(1)
+    # Dodaj rolę poziomu 1
+    level_roles = LEVEL_ROLES.get(frakcja, {})
+    role1 = level_roles.get(1)
     if role1:
-        r = await get_or_create_role(guild, role1)
-        if r:
-            await payload.member.add_roles(r)
-            try:
-                await payload.member.send(f"✅ Otrzymujesz frakcję **{frakcja.title()}** i rolę **{role1}**!")
-            except:
-                pass
+        rola = await get_or_create_role(guild, role1)
+        if rola:
+            await payload.member.add_roles(rola)
+
+    try:
+        await payload.member.send(f"✅ Wybrano frakcję: **{frakcja.title()}**, rola startowa: **{role1}**.")
+    except:
+        pass
 
 @bot.command()
 @commands.has_permissions(manage_messages=True)
