@@ -43,12 +43,3 @@ Komendy administracyjne (`!dodajxp`, `!odejmijxp`, `!resetxp`, `!resetfrakcja`, 
 Pozostałe komendy są dostępne dla wszystkich użytkowników.
 
 ---
-
-## 🚀 Uruchamianie bota
-
-> Aktualnie bot nie jest jeszcze skonfigurowany pod Railway, ale będzie uruchamiany automatycznie po wdrożeniu.
-
-Tymczasowo możesz uruchomić go lokalnie:
-
-```bash
-python bot.py
