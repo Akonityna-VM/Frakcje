@@ -1,3 +1,4 @@
 discord.py
-aiosqlite
+asyncpg
+sqlalchemy[asyncio]
 python-dotenv
