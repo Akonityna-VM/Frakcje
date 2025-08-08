@@ -20,12 +20,12 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 DOZWOLONE_KANAŁY = [
     "🎱┃eventy",
-    "🧝｜hobbit-rozmowy",
-    "⚡｜potter-rozmowy",
-    "🗡️｜wiedzmin-rozmowy",
-    "🧛｜zmierzch-rozmowy",
-    "🏹｜igrzyska-rozmowy",
-    "🌌｜sanderson-rozmowy"
+    "🧝｜hobbitˑrozmowy",
+    "⚡｜potterˑrozmowy",
+    "🗡️｜wiedzminˑrozmowy",
+    "🧛｜zmierzchˑrozmowy",
+    "🏹｜igrzyskaˑrozmowy",
+    "🌌｜sandersonˑrozmowy"
 ]
 
 ROLE_LORE = {
